@@ -1,0 +1,31 @@
+---
+- name: Install vsftpd
+  ansible.builtin.apt:
+    name: vsftpd
+    state: present
+    update_cache: true
+  tags: install
+  notify: restart
+
+- name: Configure vsftpd
+  lineinfile:
+    dest: /etc/vsftpd.conf
+    backup: yes
+    backrefs: yes
+    state: present
+    regexp: "{{ item.regexp }}"
+    line: "{{ item.line }}"
+  with_items:
+    - { regexp: anonymous_enable=YES, line: anonymous_enable=NO }
+    - { regexp: "#local_enable", line: local_enable=YES }
+    - { regexp: local_enable=NO, line: local_enable=YES }
+    - { regexp: "#write_enable", line: write_enable=YES }
+    - { regexp: write_enable=NO, line: write_enable=YES }
+  tags: configure
+  notify: restart
+
+- name: Uninstall vsftpd
+  ansible.builtin.apt:
+    name: vsftpd
+    state: absent
+  tags: uninstall

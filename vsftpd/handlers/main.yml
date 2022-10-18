@@ -1,0 +1,5 @@
+---
+- name: restart
+  ansible.builtin.service:
+    name: vsftpd
+    state: restarted
